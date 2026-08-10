@@ -77,10 +77,9 @@ export const Pricing: React.FC<PricingProps> = ({ onOpenRegister }) => {
               </div>
 
               <div className="pt-8 mt-8 border-t border-neutral-800/80">
-                <a
-                  href="https://line.me/R/ti/p/@531cnikn"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={onOpenRegister}
                   className={`w-full py-4 rounded-sm font-extrabold uppercase tracking-widest text-xs transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
                     plan.popular
                       ? 'bg-white text-black hover:bg-red-800 hover:text-white shadow-xl'
@@ -90,7 +89,7 @@ export const Pricing: React.FC<PricingProps> = ({ onOpenRegister }) => {
                   <Sparkles className="w-4 h-4" />
                   <span>免費預約線上說明會</span>
                   <ArrowRight className="w-4 h-4" />
-                </a>
+                </button>
               </div>
 
             </div>
