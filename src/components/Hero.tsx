@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { COURSE_TITLE, COURSE_SUBTITLE_1, COURSE_SUBTITLE_2 } from '../data/courseData';
-import { Flame, ArrowRight, Play, Image as ImageIcon, Sparkles, ShieldCheck, Zap, Users } from 'lucide-react';
+import { Flame, ArrowRight, Play, Sparkles, ShieldCheck, Zap, Users } from 'lucide-react';
 
 interface HeroProps {
   heroImageUrl: string;
-  onOpenImageHelper: () => void;
   onOpenRegister: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   heroImageUrl,
-  onOpenImageHelper,
   onOpenRegister,
 }) => {
   // Countdown Timer (Last week Saturday 00:00 calculation)

@@ -1,15 +1,7 @@
 import React from 'react';
 import { Flame, Mail, Phone, MapPin, Building, ShieldAlert, ExternalLink, ArrowUp, FileText } from 'lucide-react';
 
-interface FooterProps {
-  onOpenGithubGuide: () => void;
-  onOpenImageHelper: () => void;
-  onOpenRegister: () => void;
-}
-
-export const Footer: React.FC<FooterProps> = ({
-  onOpenRegister,
-}) => {
+export const Footer: React.FC = () => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -126,4 +118,3 @@ export const Footer: React.FC<FooterProps> = ({
     </footer>
   );
 };
-

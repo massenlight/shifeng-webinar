@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Flame, Github, Image as ImageIcon, ArrowRight, Menu, X, Sparkles } from 'lucide-react';
+import { Flame, ArrowRight, Menu, X, Sparkles } from 'lucide-react';
 
 interface HeaderProps {
-  onOpenGithubGuide: () => void;
-  onOpenImageHelper: () => void;
   onOpenRegister: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  onOpenGithubGuide,
-  onOpenImageHelper,
   onOpenRegister,
 }) => {
   const [scrolled, setScrolled] = useState(false);
