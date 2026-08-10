@@ -88,7 +88,7 @@ export const Pricing: React.FC<PricingProps> = ({ onOpenRegister }) => {
                   }`}
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span>立即加Line預約名額</span>
+                  <span>免費預約線上說明會</span>
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>

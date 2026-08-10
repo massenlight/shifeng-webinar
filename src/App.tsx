@@ -112,7 +112,7 @@ export default function App() {
           className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 font-bold text-xs text-white shadow-lg shadow-red-900/60 transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span>立即加入官方Line報名</span>
+          <span>免費預約線上說明會</span>
         </button>
       </div>
 
