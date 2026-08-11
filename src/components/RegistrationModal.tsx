@@ -37,6 +37,35 @@ type SubmitResponse = {
 
 const API_BASE_URL = (import.meta.env.VITE_WEBINAR_API_BASE_URL || 'https://shifeng-line-webinar-test.rexlala.chatgpt.site').replace(/\/$/, '');
 const LINE_URL = 'https://line.me/R/ti/p/@531cnikn';
+const PUBLIC_TEACHER_CACHE_MS = 60_000;
+
+let cachedTeacherResponse: { value: PublicTeacherResponse; expiresAt: number } | null = null;
+let teacherRequest: Promise<PublicTeacherResponse> | null = null;
+
+function loadPublicTeacher() {
+  if (cachedTeacherResponse && cachedTeacherResponse.expiresAt > Date.now()) {
+    return Promise.resolve(cachedTeacherResponse.value);
+  }
+  if (teacherRequest) return teacherRequest;
+
+  teacherRequest = fetch(`${API_BASE_URL}/api/public/teachers/shifeng`)
+    .then(async (response) => {
+      const result = (await response.json().catch(() => ({}))) as PublicTeacherResponse;
+      if (!response.ok || !Array.isArray(result.sessions)) {
+        throw new Error(result.error || '目前無法載入說明會場次');
+      }
+      cachedTeacherResponse = {
+        value: result,
+        expiresAt: Date.now() + PUBLIC_TEACHER_CACHE_MS,
+      };
+      return result;
+    })
+    .finally(() => {
+      teacherRequest = null;
+    });
+
+  return teacherRequest;
+}
 
 function formatSession(value: string) {
   return new Intl.DateTimeFormat('zh-TW', {
@@ -76,17 +105,39 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
   );
 
   useEffect(() => {
+    let cancelled = false;
+    void loadPublicTeacher()
+      .then((result) => {
+        if (cancelled) return;
+        const availableSessions = result.sessions || [];
+        setSessions(availableSessions);
+        setSelectedSessionId((current) =>
+          current && availableSessions.some((session) => session.id === current)
+            ? current
+            : availableSessions[0]?.id || '',
+        );
+      })
+      .catch(() => {
+        // Opening the modal will retry and show a user-facing error if needed.
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
     if (!isOpen) return;
     let cancelled = false;
-    setLoadingSessions(true);
+    setLoadingSessions(sessions.length === 0);
     setError('');
-    void fetch(`${API_BASE_URL}/api/public/teachers/shifeng`, { cache: 'no-store' })
-      .then(async (response) => {
-        const result = (await response.json().catch(() => ({}))) as PublicTeacherResponse;
-        if (!response.ok || !Array.isArray(result.sessions)) throw new Error(result.error || '目前無法載入說明會場次');
+    void loadPublicTeacher()
+      .then((result) => {
         if (cancelled) return;
-        setSessions(result.sessions);
-        setSelectedSessionId((current) => current && result.sessions?.some((session) => session.id === current) ? current : result.sessions?.[0]?.id || '');
+        const availableSessions = result.sessions || [];
+        setSessions(availableSessions);
+        setSelectedSessionId((current) =>
+          current && availableSessions.some((session) => session.id === current)
+            ? current
+            : availableSessions[0]?.id || '',
+        );
       })
       .catch((caught) => {
         if (!cancelled) setError(caught instanceof Error ? caught.message : '目前無法載入說明會場次');
@@ -162,7 +213,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
           <div>
             <p className="text-xs font-mono font-bold tracking-[0.15em] text-red-400 mb-1">免費線上說明會</p>
             <h2 id="registration-title" className="text-xl sm:text-2xl font-bold text-white font-display">選擇場次，預約 Threads 流量變現說明會</h2>
-            <p className="mt-2 text-sm text-neutral-400">直播約 2 小時・使用手機或電腦皆可參加</p>
+            <p className="mt-2 text-sm text-neutral-400">直播約 90 分鐘・使用手機或電腦皆可參加</p>
           </div>
           <button type="button" onClick={closeModal} aria-label="關閉報名視窗" className="min-w-11 min-h-11 grid place-items-center bg-black hover:bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800 transition-colors cursor-pointer rounded-md">
             <X className="w-5 h-5" />

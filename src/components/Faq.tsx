@@ -55,6 +55,8 @@ export const Faq: React.FC = () => {
                         <img
                           src={faq.imageUrl}
                           alt={faq.q}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-auto object-cover bg-transparent"
                           referrerPolicy="no-referrer"
                         />

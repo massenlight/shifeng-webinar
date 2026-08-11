@@ -292,6 +292,8 @@ export const PainPoints: React.FC = () => {
                 src={activeRole.caseImageUrl || "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=1200&q=80"}
                 alt={`${activeRole.title} 成功案例`}
                 referrerPolicy="no-referrer"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto max-h-[420px] object-cover hover:scale-105 transition-transform duration-500"
               />
               {activeRole.caseCaption && (
@@ -439,9 +441,11 @@ export const PainPoints: React.FC = () => {
 
                     {/* 3D Threads Icon Image */}
                     <img
-                      src="https://i.imgur.com/dsobka2.png"
+                      src={`${import.meta.env.BASE_URL}images/dsobka2.webp`}
                       alt="千萬流量脆煉計畫"
                       referrerPolicy="no-referrer"
+                      loading="lazy"
+                      decoding="async"
                       className="relative z-10 w-28 h-28 sm:w-36 sm:h-36 object-contain hover:scale-110 transition-transform duration-300 drop-shadow-[0_0_25px_rgba(220,38,38,0.8)]"
                     />
 
@@ -515,9 +519,11 @@ export const PainPoints: React.FC = () => {
 
                 <div className="relative w-full max-w-xs sm:max-w-sm flex justify-center">
                   <img
-                    src="https://i.imgur.com/5QV4lON.png"
+                    src={`${import.meta.env.BASE_URL}images/5QV4lON.webp`}
                     alt="世豐老師"
                     referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-auto max-h-[420px] object-contain"
                   />
                 </div>
@@ -584,9 +590,11 @@ export const PainPoints: React.FC = () => {
             {/* Lecture / Workshop Photo */}
             <div className="mt-8 overflow-hidden rounded-sm">
               <img
-                src="https://i.imgur.com/50bJkTB.png"
+                src={`${import.meta.env.BASE_URL}images/50bJkTB.webp`}
                 alt="世豐老師講座照片"
                 referrerPolicy="no-referrer"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto object-cover"
               />
             </div>

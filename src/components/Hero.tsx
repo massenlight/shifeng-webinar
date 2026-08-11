@@ -94,6 +94,8 @@ export const Hero: React.FC<HeroProps> = ({
             src={heroImageUrl}
             alt="千萬流量脆煉計畫 - Threads 行銷實戰"
             referrerPolicy="no-referrer"
+            fetchPriority="high"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-700 pointer-events-none"
           />
           {/* Subtle gradient overlay to keep text crisp while keeping image fully visible */}

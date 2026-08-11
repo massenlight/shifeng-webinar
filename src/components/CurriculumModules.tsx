@@ -115,6 +115,8 @@ export const CurriculumModules: React.FC = () => {
                               src={module.imageUrl}
                               alt={module.title}
                               referrerPolicy="no-referrer"
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-auto object-cover"
                             />
                           </div>
@@ -129,6 +131,8 @@ export const CurriculumModules: React.FC = () => {
                               src={module.imageUrl}
                               alt={module.title}
                               referrerPolicy="no-referrer"
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-auto object-cover"
                             />
                           </div>
@@ -289,9 +293,11 @@ export const CurriculumModules: React.FC = () => {
         {/* Social Proof Image */}
         <div id="case-studies" className="mt-12 max-w-4xl mx-auto overflow-hidden scroll-mt-24">
           <img
-            src="https://i.imgur.com/DXY2B8F.png"
+            src={`${import.meta.env.BASE_URL}images/DXY2B8F.webp`}
             alt="學員成果與評價"
             referrerPolicy="no-referrer"
+            loading="lazy"
+            decoding="async"
             className="w-full h-auto object-cover"
           />
         </div>

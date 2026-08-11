@@ -41,6 +41,8 @@ export const SystemSolution: React.FC<SystemSolutionProps> = ({
               src={coursePreviewImageUrl}
               alt="Threads 行銷數據成長示意圖"
               referrerPolicy="no-referrer"
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover filter brightness-90 contrast-120"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />

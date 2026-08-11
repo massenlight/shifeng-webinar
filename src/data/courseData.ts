@@ -1,5 +1,7 @@
 import { TargetRole, CourseModule, ImageSlot } from '../types';
 
+const imageAsset = (fileName: string) => `${import.meta.env.BASE_URL}images/${fileName}`;
+
 export const COURSE_TITLE = "《千萬流量脆煉計畫》";
 export const COURSE_SUBTITLE_1 = "讓素人起號立刻流量變現的最佳戰場";
 export const COURSE_SUBTITLE_2 = "——這是一堂改變品牌與掌握關鍵的 Threads 行銷實戰課";
@@ -60,7 +62,7 @@ export const TARGET_ROLES: TargetRole[] = [
     iconName: "PenTool",
     description: "突破靈感瓶頸與觸擊率低迷，建立穩定的高爆文產出節奏。",
     keyOutcomes: ["解密 Threads 熱門話題鉤子", "30 分鐘快速產出 5 篇爆款貼文", "建立高黏度個人忠實粉絲圈"],
-    caseImageUrl: "https://i.imgur.com/kc1kuE3.png",
+    caseImageUrl: imageAsset("kc1kuE3.webp"),
     caseCaption: "獨立遊戲 app 創作者，熱門下載排行衝向前 3 名"
   },
   {
@@ -70,7 +72,7 @@ export const TARGET_ROLES: TargetRole[] = [
     iconName: "Building2",
     description: "以極低成本獲取精準顧客，翻轉品牌在年輕社群中的知名度與聲量。",
     keyOutcomes: ["不用買貴爆廣告也能獲得萬次曝光", "將品牌的真實故事化為高好感貼文", "無縫導流至官網與實體門市"],
-    caseImageUrl: "https://i.imgur.com/fi1MLJc.png",
+    caseImageUrl: imageAsset("fi1MLJc.webp"),
     caseCaption: "台灣本土文創品牌，產品在設計購物平台拿下銷售第一"
   },
   {
@@ -80,7 +82,7 @@ export const TARGET_ROLES: TargetRole[] = [
     iconName: "UserCheck",
     description: "源源不絕的潛在客戶自動找上門，擺脫冷不防推銷的痛苦窘境。",
     keyOutcomes: ["展示專業知識讓客戶主動私訊諮詢", "高效率名單收集與信任建立機制", "提高個案客單價與成交轉換率"],
-    caseImageUrl: "https://i.imgur.com/rZOKgsk.png",
+    caseImageUrl: imageAsset("rZOKgsk.webp"),
     caseCaption: "資深業務打造個人 IP，後台詢問度暴增"
   },
   {
@@ -90,7 +92,7 @@ export const TARGET_ROLES: TargetRole[] = [
     iconName: "Share2",
     description: "打造高知名度個人自媒體，建立強大社交影響力。",
     keyOutcomes: ["從零起號單月粉絲突破 10,000+", "掌握話題熱度與忠實粉絲社群", "打造長期個人品牌價值"],
-    caseImageUrl: "https://i.imgur.com/mxqPCYn.png",
+    caseImageUrl: imageAsset("mxqPCYn.webp"),
     caseCaption: "行銷相關女孩經營自媒體，串文瀏覽數創新高，一天內變現 1 萬元"
   },
   {
@@ -100,7 +102,7 @@ export const TARGET_ROLES: TargetRole[] = [
     iconName: "DollarSign",
     description: "利用下班每天 30 分鐘經營 Threads，打造持續性的第二收入渠道。",
     keyOutcomes: ["接洽業配、聯盟行銷與顧問服務", "自動化導流與變現機制", "打造不倚賴主業的第二收入管道"],
-    caseImageUrl: "https://i.imgur.com/uAwYVbN.png",
+    caseImageUrl: imageAsset("uAwYVbN.webp"),
     caseCaption: "素人女孩經營脆帳號，成功接到業配"
   },
   {
@@ -110,7 +112,7 @@ export const TARGET_ROLES: TargetRole[] = [
     iconName: "Briefcase",
     description: "運用內容槓桿驗證商業模式，迅速打響企業品牌並獲取高品質合作機會。",
     keyOutcomes: ["精準吸引投資人與商業合作夥伴", "高效率建立新事業聲量與信任感", "無縫串聯商業閉環與用戶生態系"],
-    caseImageUrl: "https://i.imgur.com/BQxL11o.png",
+    caseImageUrl: imageAsset("BQxL11o.webp"),
     caseCaption: "服飾店的共創店創業計畫，後台詢問度暴增"
   },
   {
@@ -120,7 +122,7 @@ export const TARGET_ROLES: TargetRole[] = [
     iconName: "GraduationCap",
     description: "將專業知識萃取為高爆發力內容，吸引學員主動諮詢與報名課程。",
     keyOutcomes: ["塑造知識型權威 IP 人設", "把觀點貼文轉化為高價課程報名", "打造自動化知識變現閉環"],
-    caseImageUrl: "https://i.imgur.com/0mqAUK5.png",
+    caseImageUrl: imageAsset("0mqAUK5.webp"),
     caseCaption: "講師經營脆帳號，打開知名度，瀏覽次數從寥寥無幾的 100 以下到突破百萬"
   }
 ];
@@ -141,7 +143,7 @@ export const COURSE_MODULES: CourseModule[] = [
     ],
     duration: "純文字實戰",
     icon: "Zap",
-    imageUrl: "https://i.imgur.com/ae66cAu.png",
+    imageUrl: imageAsset("ae66cAu.webp"),
     imagePosition: "side"
   },
   {
@@ -160,7 +162,7 @@ export const COURSE_MODULES: CourseModule[] = [
     ],
     duration: "品牌變現模組",
     icon: "Target",
-    imageUrl: "https://i.imgur.com/1uwOY2w.jpeg",
+    imageUrl: imageAsset("1uwOY2w.webp"),
     imagePosition: "top"
   },
   {
@@ -179,7 +181,7 @@ Threads 就是建立信任最快的平台之一，
     ],
     duration: "夢想家影響力",
     icon: "Rocket",
-    imageUrl: "https://i.imgur.com/HP4pt5I.png",
+    imageUrl: imageAsset("HP4pt5I.webp"),
     imagePosition: "top"
   }
 ];
@@ -189,7 +191,7 @@ export const DEFAULT_IMAGE_SLOTS: ImageSlot[] = [
     id: "hero_banner",
     name: "主視覺 Hero 廣告 Banner",
     description: "頁面最頂部的核心形象大圖，建議呈現高級感、神秘黑色與暗紅色調、Threads 社群爆發意象",
-    currentUrl: "https://i.imgur.com/RyYpIom.jpeg",
+    currentUrl: imageAsset("RyYpIom.webp"),
     aspectRatio: "16:9",
     recommendedWidth: 1600,
     recommendedHeight: 900
@@ -227,7 +229,7 @@ export const FAQS = [
   {
     q: "我沒有粉絲，也不會寫文，適合上嗎？",
     a: "非常適合。因為大部分經營成功的人，一開始也沒有任何粉絲。真正重要的，不是文筆有多好，而是你懂不懂：什麼內容值得分享？什麼內容容易被推薦？什麼內容能建立信任？\n\n即使沒有設計背景、沒有行銷經驗、沒有經營過自媒體，你也能一步一步建立自己的流量。",
-    imageUrl: "https://i.imgur.com/dSJWQH0.png",
+    imageUrl: imageAsset("dSJWQH0.webp"),
     isHighlighted: true
   },
   {

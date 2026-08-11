@@ -99,9 +99,11 @@ export const Pricing: React.FC<PricingProps> = ({ onOpenRegister }) => {
         {/* Threads Opportunity Image Banner */}
         <div className="mt-16 max-w-3xl mx-auto overflow-hidden rounded-sm border border-neutral-800 bg-black shadow-xl">
           <img
-            src="https://i.imgur.com/Wr7CXiC.png"
+            src={`${import.meta.env.BASE_URL}images/Wr7CXiC.webp`}
             alt="你錯過FB、IG、YouTube 的成長期，別再錯過 Threads"
             referrerPolicy="no-referrer"
+            loading="lazy"
+            decoding="async"
             className="w-full h-auto object-cover"
           />
           <div className="px-4 py-3 sm:px-5 sm:py-4 border-t border-neutral-800 bg-[#0f0f0f]">

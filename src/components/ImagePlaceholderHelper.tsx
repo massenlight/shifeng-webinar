@@ -96,6 +96,8 @@ export const ImagePlaceholderHelper: React.FC<ImagePlaceholderHelperProps> = ({
                       src={slot.currentUrl}
                       alt={slot.name}
                       referrerPolicy="no-referrer"
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/30 pointer-events-none" />
