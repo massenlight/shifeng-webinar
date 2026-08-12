@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
   CalendarDays,
@@ -38,27 +38,75 @@ type SubmitResponse = {
 const API_BASE_URL = (import.meta.env.VITE_WEBINAR_API_BASE_URL || 'https://shifeng-line-webinar-test.rexlala.chatgpt.site').replace(/\/$/, '');
 const LINE_URL = 'https://line.me/R/ti/p/@531cnikn';
 const PUBLIC_TEACHER_CACHE_MS = 60_000;
+const PUBLIC_TEACHER_RETRY_DELAY_MS = 700;
+const SESSION_LOAD_ERROR = '場次讀取暫時中斷，請重新載入；若仍無法顯示，可先加入 LINE 由團隊協助。';
 
 let cachedTeacherResponse: { value: PublicTeacherResponse; expiresAt: number } | null = null;
 let teacherRequest: Promise<PublicTeacherResponse> | null = null;
 
-function loadPublicTeacher() {
-  if (cachedTeacherResponse && cachedTeacherResponse.expiresAt > Date.now()) {
+function wait(milliseconds: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+}
+
+async function fetchPublicTeacherOnce() {
+  const response = await fetch(`${API_BASE_URL}/api/public/teachers/shifeng`);
+  const result = (await response.json().catch(() => ({}))) as PublicTeacherResponse;
+  if (!response.ok || !Array.isArray(result.sessions)) {
+    throw new Error(result.error || '目前無法載入說明會場次');
+  }
+  return result;
+}
+
+async function fetchPublicTeacherWithRetry() {
+  try {
+    return await fetchPublicTeacherOnce();
+  } catch {
+    await wait(PUBLIC_TEACHER_RETRY_DELAY_MS);
+    return fetchPublicTeacherOnce();
+  }
+}
+
+function reportSessionLoadFailure() {
+  const dataLayer = (window as Window & { dataLayer?: Record<string, unknown>[] }).dataLayer;
+  dataLayer?.push({
+    event: 'webinar_session_load_failed',
+    teacher: 'shifeng',
+    attempts: 2,
+    pagePath: window.location.pathname,
+  });
+  console.error('[webinar-session-load-failed]', { teacher: 'shifeng', attempts: 2 });
+  void fetch(`${API_BASE_URL}/api/public/client-events`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      event: 'webinar_sessions_load_failed',
+      teacherSlug: 'shifeng',
+      pagePath: window.location.pathname,
+    }),
+    keepalive: true,
+  }).catch(() => {
+    // The reporting request must never block the registration experience.
+  });
+}
+
+function loadPublicTeacher(forceRefresh = false) {
+  if (!forceRefresh && cachedTeacherResponse && cachedTeacherResponse.expiresAt > Date.now()) {
     return Promise.resolve(cachedTeacherResponse.value);
   }
   if (teacherRequest) return teacherRequest;
+  if (forceRefresh) cachedTeacherResponse = null;
 
-  teacherRequest = fetch(`${API_BASE_URL}/api/public/teachers/shifeng`)
-    .then(async (response) => {
-      const result = (await response.json().catch(() => ({}))) as PublicTeacherResponse;
-      if (!response.ok || !Array.isArray(result.sessions)) {
-        throw new Error(result.error || '目前無法載入說明會場次');
-      }
+  teacherRequest = fetchPublicTeacherWithRetry()
+    .then((result) => {
       cachedTeacherResponse = {
         value: result,
         expiresAt: Date.now() + PUBLIC_TEACHER_CACHE_MS,
       };
       return result;
+    })
+    .catch((error) => {
+      reportSessionLoadFailure();
+      throw error;
     })
     .finally(() => {
       teacherRequest = null;
@@ -93,6 +141,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
   const [sessions, setSessions] = useState<WebinarSession[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState('');
   const [loadingSessions, setLoadingSessions] = useState(false);
+  const [sessionError, setSessionError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
@@ -103,6 +152,25 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
     () => sessions.find((session) => session.id === selectedSessionId) || null,
     [selectedSessionId, sessions],
   );
+
+  const refreshSessions = useCallback(async (forceRefresh = false) => {
+    setLoadingSessions(true);
+    setSessionError('');
+    try {
+      const result = await loadPublicTeacher(forceRefresh);
+      const availableSessions = result.sessions || [];
+      setSessions(availableSessions);
+      setSelectedSessionId((current) =>
+        current && availableSessions.some((session) => session.id === current)
+          ? current
+          : availableSessions[0]?.id || '',
+      );
+    } catch {
+      setSessionError(SESSION_LOAD_ERROR);
+    } finally {
+      setLoadingSessions(false);
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -125,28 +193,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
 
   useEffect(() => {
     if (!isOpen) return;
-    let cancelled = false;
-    setLoadingSessions(sessions.length === 0);
     setError('');
-    void loadPublicTeacher()
-      .then((result) => {
-        if (cancelled) return;
-        const availableSessions = result.sessions || [];
-        setSessions(availableSessions);
-        setSelectedSessionId((current) =>
-          current && availableSessions.some((session) => session.id === current)
-            ? current
-            : availableSessions[0]?.id || '',
-        );
-      })
-      .catch((caught) => {
-        if (!cancelled) setError(caught instanceof Error ? caught.message : '目前無法載入說明會場次');
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingSessions(false);
-      });
-    return () => { cancelled = true; };
-  }, [isOpen]);
+    void refreshSessions();
+  }, [isOpen, refreshSessions]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -238,24 +287,43 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
             <form onSubmit={handleSubmit} className="space-y-7">
               <fieldset>
                 <legend className="text-sm font-bold text-white mb-3 flex items-center gap-2"><CalendarDays className="w-5 h-5 text-red-500" />1. 選擇直播場次</legend>
-                {loadingSessions ? (
+                {loadingSessions && sessions.length === 0 ? (
                   <div className="min-h-28 border border-neutral-800 rounded-md grid place-items-center text-neutral-400" role="status"><span className="inline-flex items-center gap-2"><LoaderCircle className="w-5 h-5 animate-spin motion-reduce:animate-none" />正在讀取可報名場次…</span></div>
+                ) : sessionError && sessions.length === 0 ? (
+                  <div className="min-h-36 border border-red-900/70 bg-red-950/20 rounded-md grid place-items-center text-center px-5 py-5" role="alert">
+                    <div>
+                      <CircleAlert className="w-6 h-6 text-red-400 mx-auto" />
+                      <p className="mt-3 text-sm leading-6 text-neutral-200">{sessionError}</p>
+                      <div className="mt-4 flex flex-col sm:flex-row justify-center gap-2">
+                        <button type="button" onClick={() => void refreshSessions(true)} className="min-h-11 px-4 rounded-md bg-red-700 hover:bg-red-600 text-white text-sm font-bold transition-colors cursor-pointer">重新載入場次</button>
+                        <a href={LINE_URL} rel="noreferrer" className="min-h-11 px-4 rounded-md border border-neutral-700 hover:border-neutral-500 text-neutral-100 text-sm font-bold inline-flex items-center justify-center transition-colors">先加入 LINE，由團隊協助</a>
+                      </div>
+                    </div>
+                  </div>
                 ) : sessions.length === 0 ? (
                   <div className="min-h-28 border border-neutral-800 rounded-md grid place-items-center text-center px-5 text-neutral-400"><p>目前尚無開放中的場次，請稍後再回來查看。</p></div>
                 ) : (
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {sessions.map((session) => {
-                      const selected = selectedSessionId === session.id;
-                      return (
-                        <label key={session.id} className={`min-h-28 p-4 border rounded-md cursor-pointer transition-colors flex gap-3 ${selected ? 'border-red-500 bg-red-950/35' : 'border-neutral-800 bg-[#111] hover:border-neutral-600'}`}>
-                          <input type="radio" name="webinar-session" value={session.id} checked={selected} onChange={() => setSelectedSessionId(session.id)} className="mt-1 w-4 h-4 accent-red-600 shrink-0" />
-                          <span>
-                            <strong className="block text-base text-white">{formatSession(session.startsAt)}</strong>
-                            <span className="mt-2 text-xs text-neutral-400 flex items-center gap-1.5"><Clock3 className="w-4 h-4" />約 {session.durationMinutes} 分鐘・線上直播</span>
-                          </span>
-                        </label>
-                      );
-                    })}
+                  <div>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {sessions.map((session) => {
+                        const selected = selectedSessionId === session.id;
+                        return (
+                          <label key={session.id} className={`min-h-28 p-4 border rounded-md cursor-pointer transition-colors flex gap-3 ${selected ? 'border-red-500 bg-red-950/35' : 'border-neutral-800 bg-[#111] hover:border-neutral-600'}`}>
+                            <input type="radio" name="webinar-session" value={session.id} checked={selected} onChange={() => setSelectedSessionId(session.id)} className="mt-1 w-4 h-4 accent-red-600 shrink-0" />
+                            <span>
+                              <strong className="block text-base text-white">{formatSession(session.startsAt)}</strong>
+                              <span className="mt-2 text-xs text-neutral-400 flex items-center gap-1.5"><Clock3 className="w-4 h-4" />約 {session.durationMinutes} 分鐘・線上直播</span>
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    {sessionError && (
+                      <div className="mt-3 p-3 border border-amber-800/70 bg-amber-950/20 rounded-md text-sm text-amber-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3" role="alert">
+                        <span>場次更新暫時中斷，已保留目前可報名場次。</span>
+                        <button type="button" onClick={() => void refreshSessions(true)} className="min-h-10 px-3 rounded-md border border-amber-700 hover:border-amber-500 font-bold cursor-pointer">重新載入</button>
+                      </div>
+                    )}
                   </div>
                 )}
               </fieldset>
