@@ -11,6 +11,12 @@ import {
   UserRound,
   X,
 } from 'lucide-react';
+import {
+  campaignData,
+  ensureLandingVisit,
+  trackFormOpen,
+  trackRegistrationSubmitted,
+} from '../lib/landingTracking';
 
 interface RegistrationModalProps {
   isOpen: boolean;
@@ -35,7 +41,7 @@ type SubmitResponse = {
   error?: string;
 };
 
-const API_BASE_URL = (import.meta.env.VITE_WEBINAR_API_BASE_URL || 'https://shifeng-line-webinar-test.rexlala.chatgpt.site').replace(/\/$/, '');
+const API_BASE_URL = (import.meta.env.VITE_WEBINAR_API_BASE_URL || 'https://webinar-test.root2studio.com').replace(/\/$/, '');
 const LINE_URL = 'https://line.me/R/ti/p/@531cnikn';
 const PUBLIC_TEACHER_CACHE_MS = 60_000;
 const PUBLIC_TEACHER_RETRY_DELAY_MS = 700;
@@ -127,17 +133,6 @@ function formatSession(value: string) {
   }).format(new Date(value));
 }
 
-function campaignData() {
-  const params = new URLSearchParams(window.location.search);
-  return {
-    sourcePage: `${window.location.origin}${window.location.pathname}`,
-    utmSource: params.get('utm_source') || '',
-    utmMedium: params.get('utm_medium') || '',
-    utmCampaign: params.get('utm_campaign') || '',
-    entryVisit: params.get('entry_visit') || '',
-  };
-}
-
 export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, onClose }) => {
   const [sessions, setSessions] = useState<WebinarSession[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState('');
@@ -175,6 +170,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
 
   useEffect(() => {
     let cancelled = false;
+    void ensureLandingVisit();
     void loadPublicTeacher()
       .then((result) => {
         if (cancelled) return;
@@ -195,6 +191,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
   useEffect(() => {
     if (!isOpen) return;
     setError('');
+    void trackFormOpen();
     void refreshSessions();
   }, [isOpen, refreshSessions]);
 
@@ -230,6 +227,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
     }
     setSubmitting(true);
     try {
+      const entryVisit = await ensureLandingVisit();
       const response = await fetch(`${API_BASE_URL}/api/public/webinar-registrations`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -237,7 +235,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
           teacherSlug: 'shifeng',
           sessionId: selectedSessionId,
           ...form,
-          ...campaignData(),
+          ...campaignData(entryVisit),
         }),
       });
       const result = (await response.json().catch(() => ({}))) as SubmitResponse;
@@ -247,6 +245,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
         return;
       }
       if (!response.ok || !result.ok) throw new Error(result.error || '報名暫時無法完成，請稍後再試');
+      trackRegistrationSubmitted(entryVisit);
       setLineUrl(result.lineUrl || LINE_URL);
       setSubmitted(true);
     } catch (caught) {
