@@ -1,19 +1,48 @@
-import React, { useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
-import { PainPoints } from './components/PainPoints';
-import { CurriculumModules } from './components/CurriculumModules';
-import { Pricing } from './components/Pricing';
-import { Faq } from './components/Faq';
-import { Footer } from './components/Footer';
-import { RegistrationModal } from './components/RegistrationModal';
 import { DEFAULT_IMAGE_SLOTS } from './data/courseData';
+import { campaignData, ensureLandingVisit } from './lib/landingTracking';
 import { Sparkles, Flame } from 'lucide-react';
+
+const PainPoints = lazy(() => import('./components/PainPoints').then((module) => ({ default: module.PainPoints })));
+const CurriculumModules = lazy(() => import('./components/CurriculumModules').then((module) => ({ default: module.CurriculumModules })));
+const Pricing = lazy(() => import('./components/Pricing').then((module) => ({ default: module.Pricing })));
+const Faq = lazy(() => import('./components/Faq').then((module) => ({ default: module.Faq })));
+const Footer = lazy(() => import('./components/Footer').then((module) => ({ default: module.Footer })));
+const RegistrationModal = lazy(() => import('./components/RegistrationModal').then((module) => ({ default: module.RegistrationModal })));
+const LINE_REGISTRATION_URL = (import.meta.env.VITE_LINE_REGISTRATION_URL || '').trim();
 
 export default function App() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (LINE_REGISTRATION_URL) void ensureLandingVisit();
+  }, []);
+
+  async function openLineRegistration() {
+    const entryVisit = await ensureLandingVisit();
+    const campaign = campaignData(entryVisit);
+    const url = new URL(LINE_REGISTRATION_URL);
+    const values: Record<string, string> = {
+      entry_visit: campaign.entryVisit,
+      utm_source: campaign.utmSource,
+      utm_medium: campaign.utmMedium,
+      utm_campaign: campaign.utmCampaign,
+      utm_content: campaign.utmContent,
+      utm_term: campaign.utmTerm,
+    };
+    for (const [key, value] of Object.entries(values)) {
+      if (value) url.searchParams.set(key, value);
+    }
+    window.location.assign(url.toString());
+  }
+
   const handleOpenRegister = () => {
+    if (LINE_REGISTRATION_URL) {
+      void openLineRegistration();
+      return;
+    }
     setIsRegisterModalOpen(true);
   };
 
@@ -32,19 +61,16 @@ export default function App() {
           onOpenRegister={handleOpenRegister}
         />
 
-        <PainPoints />
-
-        <CurriculumModules />
-
-        <Faq />
-
-        <Pricing
-          onOpenRegister={handleOpenRegister}
-        />
+        <Suspense fallback={<div className="min-h-[45vh] bg-black" aria-hidden="true" />}>
+          <PainPoints />
+          <CurriculumModules />
+          <Faq />
+          <Pricing onOpenRegister={handleOpenRegister} />
+        </Suspense>
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Suspense fallback={null}><Footer /></Suspense>
 
       {/* Fixed Floating Bottom Bar for Mobile & Desktop */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-lg p-3 rounded-2xl bg-black/90 backdrop-blur-xl border border-red-800/80 shadow-2xl shadow-red-950 flex items-center justify-between gap-3">
@@ -66,10 +92,14 @@ export default function App() {
         </button>
       </div>
 
-      <RegistrationModal
-        isOpen={isRegisterModalOpen}
-        onClose={() => setIsRegisterModalOpen(false)}
-      />
+      {!LINE_REGISTRATION_URL ? (
+        <Suspense fallback={null}>
+          <RegistrationModal
+            isOpen={isRegisterModalOpen}
+            onClose={() => setIsRegisterModalOpen(false)}
+          />
+        </Suspense>
+      ) : null}
 
     </div>
   );
