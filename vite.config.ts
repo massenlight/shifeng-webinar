@@ -5,7 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    base: '/shifeng-webinar/',
+    base: process.env.VITE_BASE_PATH || '/shifeng-webinar/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

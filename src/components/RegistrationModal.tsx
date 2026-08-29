@@ -42,6 +42,7 @@ type SubmitResponse = {
 };
 
 const API_BASE_URL = (import.meta.env.VITE_WEBINAR_API_BASE_URL || 'https://webinar-test.root2studio.com').replace(/\/$/, '');
+const REGISTRATION_FLOW = import.meta.env.VITE_REGISTRATION_FLOW === 'fast' ? 'fast' : 'legacy';
 const LINE_URL = 'https://line.me/R/ti/p/@531cnikn';
 const PUBLIC_TEACHER_CACHE_MS = 60_000;
 const PUBLIC_TEACHER_RETRY_DELAY_MS = 700;
@@ -206,7 +207,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
 
   useEffect(() => {
     if (!submitted) return;
-    const timer = window.setTimeout(() => window.location.assign(lineUrl), 1800);
+    const timer = window.setTimeout(
+      () => window.location.assign(lineUrl),
+      REGISTRATION_FLOW === 'fast' ? 250 : 1800,
+    );
     return () => window.clearTimeout(timer);
   }, [lineUrl, submitted]);
 
@@ -234,6 +238,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
         body: JSON.stringify({
           teacherSlug: 'shifeng',
           sessionId: selectedSessionId,
+          flow: REGISTRATION_FLOW,
           ...form,
           ...campaignData(entryVisit),
         }),
@@ -277,7 +282,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
               </div>
               <h3 className="mt-6 text-2xl font-black font-display">說明會預約完成</h3>
               {selectedSession && <p className="mt-3 text-red-300 font-bold">{formatSession(selectedSession.startsAt)}・台北時間</p>}
-              <p className="mt-4 text-sm leading-7 text-neutral-300">系統即將帶您加入世豐官方 LINE。請完成加好友，以便取得說明會相關通知。</p>
+              <p className="mt-4 text-sm leading-7 text-neutral-300">系統即將帶您前往世豐官方 LINE。完成 LINE 確認後會自動完成報名，不需要再填一次資料。</p>
               <a href={lineUrl} className="mt-7 min-h-12 px-7 bg-[#06c755] hover:bg-[#05ae4a] text-white font-extrabold rounded-md inline-flex items-center justify-center gap-2 transition-colors" rel="noreferrer">
                 立即前往加入 LINE <ArrowRight className="w-5 h-5" />
               </a>
