@@ -134,6 +134,7 @@ function campaignData() {
     utmSource: params.get('utm_source') || '',
     utmMedium: params.get('utm_medium') || '',
     utmCampaign: params.get('utm_campaign') || '',
+    entryVisit: params.get('entry_visit') || '',
   };
 }
 
