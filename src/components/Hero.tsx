@@ -56,8 +56,8 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <section className="relative pt-12 pb-14 md:pt-16 md:pb-20 overflow-hidden bg-[#050505] text-white border-b border-red-900/30">
       {/* Background Radial Ambient Crimson Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-red-900/15 blur-[160px] rounded-full pointer-events-none" />
-      <div className="absolute top-1/3 right-10 w-[350px] h-[350px] bg-red-950/40 blur-[120px] rounded-full pointer-events-none" />
+      <div className="hidden md:block absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-red-900/15 blur-[160px] rounded-full pointer-events-none" />
+      <div className="hidden md:block absolute top-1/3 right-10 w-[350px] h-[350px] bg-red-950/40 blur-[120px] rounded-full pointer-events-none" />
 
       {/* Subtle Fine Grid Overlay */}
       <div 
@@ -87,7 +87,7 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
 
         {/* Main Title Section with Background Image */}
-        <div className="relative text-left max-w-5xl mx-auto space-y-6 p-8 sm:p-12 md:p-16 rounded-sm overflow-hidden border border-red-900/40 bg-[#0f0f0f] shadow-2xl group">
+        <div className="relative text-left max-w-5xl mx-auto space-y-6 p-8 sm:p-12 md:p-16 rounded-sm overflow-hidden border border-red-900/40 bg-[#0f0f0f] shadow-lg md:shadow-2xl group">
           
           {/* Background Image (img) - Full brightness / normal display without heavy dark mask */}
           <img
@@ -95,8 +95,8 @@ export const Hero: React.FC<HeroProps> = ({
             alt="千萬流量脆煉計畫 - Threads 行銷實戰"
             referrerPolicy="no-referrer"
             fetchPriority="high"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+            loading="eager"
+            className="absolute inset-0 w-full h-full object-cover opacity-85 md:group-hover:scale-105 md:transition-transform md:duration-700 pointer-events-none"
           />
           {/* Subtle gradient overlay to keep text crisp while keeping image fully visible */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent pointer-events-none" />

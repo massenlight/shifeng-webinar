@@ -4,22 +4,47 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>《千萬流量脆煉計畫》—— 世豐的 Threads 行銷實戰課</title>
+    <link
+      rel="preload"
+      as="image"
+      href="/shifeng-webinar/images/RyYpIom.webp"
+      fetchpriority="high"
+    />
 
     <!-- Google Tag Manager -->
     <script>
       (function(w,d,s,l,i){
+        w[l]=w[l]||[];
+        var interactionEvents=['pointerdown','touchstart','keydown'];
+        var fallbackTimer;
+
+        function cleanup(){
+          interactionEvents.forEach(function(eventName){
+            w.removeEventListener(eventName,requestLoad,true);
+          });
+          if(fallbackTimer) w.clearTimeout(fallbackTimer);
+        }
+
         function loadGtm(){
           if (w.__shifengGtmLoaded) return;
           w.__shifengGtmLoaded = true;
-          w[l]=w[l]||[];
+          cleanup();
           w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
           var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
           j.async=true;
           j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
           f.parentNode.insertBefore(j,f);
         }
-        if (d.readyState === 'complete') setTimeout(loadGtm, 0);
-        else w.addEventListener('load', loadGtm, {once:true});
+
+        function requestLoad(){
+          var remaining=Math.max(0,2500-(w.performance&&w.performance.now?w.performance.now():2500));
+          w.setTimeout(loadGtm,remaining);
+        }
+
+        interactionEvents.forEach(function(eventName){
+          w.addEventListener(eventName,requestLoad,{once:true,capture:true,passive:true});
+        });
+        fallbackTimer=w.setTimeout(loadGtm,5000);
       })(window,document,'script','dataLayer','GTM-KSB7777L');
     </script>
     <!-- End Google Tag Manager -->
