@@ -11,7 +11,10 @@ const Pricing = lazy(() => import('./components/Pricing').then((module) => ({ de
 const Faq = lazy(() => import('./components/Faq').then((module) => ({ default: module.Faq })));
 const Footer = lazy(() => import('./components/Footer').then((module) => ({ default: module.Footer })));
 const RegistrationModal = lazy(() => import('./components/RegistrationModal').then((module) => ({ default: module.RegistrationModal })));
-const LINE_REGISTRATION_URL = (import.meta.env.VITE_LINE_REGISTRATION_URL || '').trim();
+const LINE_REGISTRATION_URL = (
+  import.meta.env.VITE_LINE_REGISTRATION_URL
+  || 'https://liff.line.me/2011298970-dNpJY7A2/choose'
+).trim();
 
 export default function App() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
