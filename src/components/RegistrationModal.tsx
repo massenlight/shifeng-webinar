@@ -42,7 +42,7 @@ type SubmitResponse = {
 };
 
 const API_BASE_URL = (import.meta.env.VITE_WEBINAR_API_BASE_URL || 'https://webinar-test.root2studio.com').replace(/\/$/, '');
-const REGISTRATION_FLOW = import.meta.env.VITE_REGISTRATION_FLOW === 'fast' ? 'fast' : 'legacy';
+const REGISTRATION_FLOW = import.meta.env.VITE_REGISTRATION_FLOW === 'legacy' ? 'legacy' : 'fast';
 const LINE_URL = 'https://line.me/R/ti/p/@531cnikn';
 const PUBLIC_TEACHER_CACHE_MS = 60_000;
 const PUBLIC_TEACHER_RETRY_DELAY_MS = 700;
