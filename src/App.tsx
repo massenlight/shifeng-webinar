@@ -15,6 +15,14 @@ const LINE_REGISTRATION_URL = (
   import.meta.env.VITE_LINE_REGISTRATION_URL
   || 'https://liff.line.me/2011298970-dNpJY7A2/choose'
 ).trim();
+const TRACKING_WAIT_MS = 700;
+
+function trackingVisitWithDeadline() {
+  return Promise.race([
+    ensureLandingVisit(),
+    new Promise<string>((resolve) => window.setTimeout(() => resolve(''), TRACKING_WAIT_MS)),
+  ]);
+}
 
 export default function App() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -24,7 +32,9 @@ export default function App() {
   }, []);
 
   async function openLineRegistration() {
-    const entryVisit = await ensureLandingVisit();
+    // Tracking must never hold up the registration journey. The original
+    // request keeps running in the background through fetch keepalive.
+    const entryVisit = await trackingVisitWithDeadline();
     const campaign = campaignData(entryVisit);
     const url = new URL(LINE_REGISTRATION_URL);
     const values: Record<string, string> = {
