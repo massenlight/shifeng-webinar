@@ -13,7 +13,7 @@ const Footer = lazy(() => import('./components/Footer').then((module) => ({ defa
 const RegistrationModal = lazy(() => import('./components/RegistrationModal').then((module) => ({ default: module.RegistrationModal })));
 const LINE_REGISTRATION_URL = (
   import.meta.env.VITE_LINE_REGISTRATION_URL
-  || 'https://liff.line.me/2011298970-dNpJY7A2/choose'
+  || 'https://webinar-test.root2studio.com/go/liff?flow=choose'
 ).trim();
 const TRACKING_WAIT_MS = 150;
 
