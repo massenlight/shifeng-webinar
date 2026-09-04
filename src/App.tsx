@@ -2,7 +2,7 @@ import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { DEFAULT_IMAGE_SLOTS } from './data/courseData';
-import { campaignData, ensureLandingVisit } from './lib/landingTracking';
+import { campaignData, ensureLandingVisit, trackLineRegistrationClick } from './lib/landingTracking';
 import { Sparkles, Flame } from 'lucide-react';
 
 const PainPoints = lazy(() => import('./components/PainPoints').then((module) => ({ default: module.PainPoints })));
@@ -57,6 +57,7 @@ export default function App() {
     // Tracking must never hold up the registration journey. The original
     // request keeps running in the background through fetch keepalive.
     const entryVisit = await trackingVisitWithDeadline();
+    await trackLineRegistrationClick(entryVisit);
     const campaign = campaignData(entryVisit);
     const url = new URL(LINE_REGISTRATION_URL);
     const values: Record<string, string> = {
@@ -66,6 +67,7 @@ export default function App() {
       utm_campaign: campaign.utmCampaign,
       utm_content: campaign.utmContent,
       utm_term: campaign.utmTerm,
+      fbclid: campaign.fbclid,
     };
     for (const [key, value] of Object.entries(values)) {
       if (value) url.searchParams.set(key, value);

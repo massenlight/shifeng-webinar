@@ -10,6 +10,7 @@ export type CampaignData = {
   utmCampaign: string;
   utmContent: string;
   utmTerm: string;
+  fbclid: string;
   entryVisit: string;
 };
 
@@ -23,14 +24,26 @@ function validVisitId(value: string) {
 }
 
 function dataLayerPush(event: string, data: CampaignData) {
-  const dataLayer = (window as Window & { dataLayer?: Record<string, unknown>[] }).dataLayer;
-  dataLayer?.push({
+  const trackingWindow = window as Window & { dataLayer?: Record<string, unknown>[] };
+  const dataLayer = trackingWindow.dataLayer = trackingWindow.dataLayer || [];
+  dataLayer.push({
     event,
     utm_source: data.utmSource,
     utm_medium: data.utmMedium,
     utm_campaign: data.utmCampaign,
     utm_content: data.utmContent,
+    fbclid: data.fbclid,
   });
+}
+
+async function waitForMetaPixel(timeoutMs = 120) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
+    if (typeof fbq === 'function') return fbq;
+    await new Promise((resolve) => window.setTimeout(resolve, 20));
+  }
+  return null;
 }
 
 function safeReferrer() {
@@ -75,6 +88,7 @@ export function campaignData(entryVisit = ''): CampaignData {
     utmCampaign: params.get('utm_campaign') || '',
     utmContent: params.get('utm_content') || '',
     utmTerm: params.get('utm_term') || '',
+    fbclid: params.get('fbclid') || '',
     entryVisit: validVisitId(queryVisit) ? queryVisit : entryVisit,
   };
 }
@@ -125,4 +139,19 @@ export async function trackFormOpen() {
 
 export function trackRegistrationSubmitted(entryVisit: string) {
   dataLayerPush('webinar_registration_submitted', campaignData(entryVisit));
+}
+
+export async function trackLineRegistrationClick(entryVisit: string) {
+  const data = campaignData(entryVisit);
+  dataLayerPush('webinar_line_clicked', data);
+  if (entryVisit) {
+    void fetch(`${API_BASE_URL}/api/public/landing-events`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ event: 'line_click', entryVisit }),
+      keepalive: true,
+    }).catch(() => {});
+  }
+  const fbq = await waitForMetaPixel();
+  fbq?.('track', 'Lead');
 }
