@@ -6,6 +6,51 @@
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KSB7777L');</script>
 <!-- End Google Tag Manager -->
+<script>
+(function(){
+  var API = 'https://webinar-test.root2studio.com/api/public/landing-events';
+  var ENTRY = 'https://webinar-test.root2studio.com/r/github-light-line';
+  var SOURCE = 'github-light-line';
+  var query = new URLSearchParams(window.location.search);
+  var keys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
+  var signature = keys.map(function(key){ return key + '=' + (query.get(key) || ''); }).join('&');
+  var storageKey = 'shifeng_light_entry_visit:' + signature;
+  var visitId = '';
+  try { visitId = sessionStorage.getItem(storageKey) || ''; } catch (_) {}
+  if (!visitId && window.crypto && typeof window.crypto.randomUUID === 'function') {
+    visitId = window.crypto.randomUUID();
+    try { sessionStorage.setItem(storageKey, visitId); } catch (_) {}
+  }
+  function entryUrl(){
+    var target = new URL(ENTRY);
+    keys.forEach(function(key){ var value = query.get(key); if (value) target.searchParams.set(key, value); });
+    if (visitId) target.searchParams.set('entry_visit', visitId);
+    return target.toString();
+  }
+  function applyEntryLinks(){
+    document.querySelectorAll('a[data-register]').forEach(function(link){ link.href = entryUrl(); });
+  }
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: 'shifeng_light_page_view', entry_source: SOURCE });
+  window.__shifengLightEntry = { apply: applyEntryLinks, url: entryUrl };
+  var payload = {
+    event: 'page_view', sourceSlug: SOURCE, entryVisit: visitId,
+    utmSource: query.get('utm_source') || '', utmMedium: query.get('utm_medium') || '',
+    utmCampaign: query.get('utm_campaign') || '', utmContent: query.get('utm_content') || '',
+    utmTerm: query.get('utm_term') || '', sourcePage: window.location.pathname,
+    referrer: document.referrer || ''
+  };
+  fetch(API, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload), keepalive:true })
+    .then(function(response){ return response.ok ? response.json() : null; })
+    .then(function(result){
+      if (!result || !result.entryVisit) return;
+      visitId = result.entryVisit;
+      try { sessionStorage.setItem(storageKey, visitId); } catch (_) {}
+      applyEntryLinks();
+    }).catch(function(){});
+  document.addEventListener('DOMContentLoaded', applyEntryLinks, { once:true });
+})();
+</script>
 <title>千萬流量脆煉計畫</title>
 <meta name="description" content="世豐老師的 Threads 行銷實戰課：零廣告費、免露臉，讓素人從 0 起號、單篇貼文破百萬觸及，再把流量變成收入。免費預約線上說明會。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -307,7 +352,7 @@ html.js .reveal.in{opacity:1;transform:none}
       <a href="#teacher">講師</a>
       <a href="#faq">常見問題</a>
     </nav>
-    <a class="btn btn--primary btn--sm" data-register href="https://webinar-test.root2studio.com/go/liff?flow=choose">免費預約說明會</a>
+    <a class="btn btn--primary btn--sm" data-register href="https://webinar-test.root2studio.com/r/github-light-line">加入官方 LINE</a>
   </div>
 </header>
 
@@ -324,7 +369,7 @@ html.js .reveal.in{opacity:1;transform:none}
           <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>從貼文、私訊到成交的完整變現路徑</span></li>
         </ul>
         <div class="cta-row">
-          <a class="btn btn--primary" data-register href="https://webinar-test.root2studio.com/go/liff?flow=choose">免費預約線上說明會 <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn--primary" data-register href="https://webinar-test.root2studio.com/r/github-light-line">加入世豐老師官方 LINE <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <a class="btn btn--ghost" href="#results">看學員成果</a>
         </div>
         <p class="cta-note" style="margin:12px 0 0">直播約 90 分鐘，手機或電腦皆可參加。</p>
@@ -578,8 +623,8 @@ html.js .reveal.in{opacity:1;transform:none}
           <p class="deal__eyebrow">免費線上說明會</p>
           <p class="deal__price">限量早鳥 <b>8.1</b> 折</p>
           <p class="deal__count" id="deal-count">先免費聽 90 分鐘說明會，再決定要不要加入。</p>
-          <a class="btn btn--light" data-register href="https://webinar-test.root2studio.com/go/liff?flow=choose">免費預約線上說明會 <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          <p class="deal__fine">說明會免費參加，直播約 90 分鐘，手機或電腦皆可。完成預約後會前往世豐官方 LINE 確認場次。</p>
+          <a class="btn btn--light" data-register href="https://webinar-test.root2studio.com/r/github-light-line">加入世豐老師官方 LINE <svg class="btn__arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <p class="deal__fine">點擊後會前往世豐老師官方 LINE；完成加好友與身分確認後，即可在 LINE 收到後續資訊。</p>
         </div>
       </div>
     </div>
@@ -608,19 +653,23 @@ html.js .reveal.in{opacity:1;transform:none}
 
 <div class="mbar" id="mbar">
   <div class="mbar__txt"><b id="mbar-deal">限量早鳥 8.1 折</b>免費線上說明會 · 約 90 分鐘</div>
-  <a class="btn btn--primary btn--sm" data-register href="https://webinar-test.root2studio.com/go/liff?flow=choose">免費預約</a>
+  <a class="btn btn--primary btn--sm" data-register href="https://webinar-test.root2studio.com/r/github-light-line">加入官方 LINE</a>
 </div>
 
 <script>
 (function(){
-  var REGISTER_URL = 'https://webinar-test.root2studio.com/go/liff?flow=choose';
   var DEADLINE = '2026-09-26T00:00:00+08:00';
 
   var root = document.documentElement;
   root.classList.add('js');
 
   document.querySelectorAll('a[data-register]').forEach(function(a){
-    a.href = REGISTER_URL; a.target = '_blank'; a.rel = 'noopener';
+    if (window.__shifengLightEntry) window.__shifengLightEntry.apply();
+    a.removeAttribute('target');
+    a.addEventListener('click', function(){
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event:'shifeng_light_line_click', entry_source:'github-light-line' });
+    });
   });
 
   function countdown(){
