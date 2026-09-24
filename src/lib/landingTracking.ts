@@ -14,7 +14,7 @@ export type CampaignData = {
   entryVisit: string;
 };
 
-const API_BASE_URL = (import.meta.env.VITE_WEBINAR_API_BASE_URL || 'https://webinar-test.root2studio.com').replace(/\/$/, '');
+const API_BASE_URL = (import.meta.env.VITE_WEBINAR_API_BASE_URL || 'https://massenlighten-platform.massenlighten-company.workers.dev').replace(/\/$/, '');
 const VISIT_KEY_PREFIX = 'shifeng-webinar-entry-visit-v1';
 let landingVisitPromise: Promise<string> | null = null;
 let formOpenTracked = false;
