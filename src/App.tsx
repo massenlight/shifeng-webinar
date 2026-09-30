@@ -2,7 +2,7 @@ import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { DEFAULT_IMAGE_SLOTS } from './data/courseData';
-import { campaignData, ensureLandingVisit, trackLineRegistrationClick } from './lib/landingTracking';
+import { ensureLandingVisit } from './lib/landingTracking';
 import { Sparkles, Flame } from 'lucide-react';
 
 const PainPoints = lazy(() => import('./components/PainPoints').then((module) => ({ default: module.PainPoints })));
@@ -11,18 +11,6 @@ const Pricing = lazy(() => import('./components/Pricing').then((module) => ({ de
 const Faq = lazy(() => import('./components/Faq').then((module) => ({ default: module.Faq })));
 const Footer = lazy(() => import('./components/Footer').then((module) => ({ default: module.Footer })));
 const RegistrationModal = lazy(() => import('./components/RegistrationModal').then((module) => ({ default: module.RegistrationModal })));
-const LINE_REGISTRATION_URL = (
-  import.meta.env.VITE_LINE_REGISTRATION_URL
-  || 'https://massenlighten-platform.massenlighten-company.workers.dev/go/liff?flow=choose'
-).trim();
-const TRACKING_WAIT_MS = 150;
-
-function trackingVisitWithDeadline() {
-  return Promise.race([
-    ensureLandingVisit(),
-    new Promise<string>((resolve) => window.setTimeout(() => resolve(''), TRACKING_WAIT_MS)),
-  ]);
-}
 
 export default function App() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -30,7 +18,7 @@ export default function App() {
   const deferredContentAnchor = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (LINE_REGISTRATION_URL) void ensureLandingVisit();
+    void ensureLandingVisit();
   }, []);
 
   useEffect(() => {
@@ -53,33 +41,7 @@ export default function App() {
     };
   }, []);
 
-  async function openLineRegistration() {
-    // Tracking must never hold up the registration journey. The original
-    // request keeps running in the background through fetch keepalive.
-    const entryVisit = await trackingVisitWithDeadline();
-    await trackLineRegistrationClick(entryVisit);
-    const campaign = campaignData(entryVisit);
-    const url = new URL(LINE_REGISTRATION_URL);
-    const values: Record<string, string> = {
-      entry_visit: campaign.entryVisit,
-      utm_source: campaign.utmSource,
-      utm_medium: campaign.utmMedium,
-      utm_campaign: campaign.utmCampaign,
-      utm_content: campaign.utmContent,
-      utm_term: campaign.utmTerm,
-      fbclid: campaign.fbclid,
-    };
-    for (const [key, value] of Object.entries(values)) {
-      if (value) url.searchParams.set(key, value);
-    }
-    window.location.assign(url.toString());
-  }
-
   const handleOpenRegister = () => {
-    if (LINE_REGISTRATION_URL) {
-      void openLineRegistration();
-      return;
-    }
     setIsRegisterModalOpen(true);
   };
 
@@ -132,14 +94,12 @@ export default function App() {
         </button>
       </div>
 
-      {!LINE_REGISTRATION_URL ? (
         <Suspense fallback={null}>
           <RegistrationModal
             isOpen={isRegisterModalOpen}
             onClose={() => setIsRegisterModalOpen(false)}
           />
         </Suspense>
-      ) : null}
 
     </div>
   );

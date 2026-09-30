@@ -3,24 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KSB7777L');</script>
-<!-- End Google Tag Manager -->
+<script src="https://massenlighten-platform.massenlighten-company.workers.dev/tracking/shifeng-pixel.js?v=20261001-1" data-pageview="true"></script>
 <script>
 (function(){
   var API = 'https://massenlighten-platform.massenlighten-company.workers.dev/api/public/landing-events';
   var ENTRY = 'https://massenlighten-platform.massenlighten-company.workers.dev/r/github-light-line';
   var SOURCE = 'github-light-line';
   var query = new URLSearchParams(window.location.search);
-  var keys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
+  var keys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid'];
   var signature = keys.map(function(key){ return key + '=' + (query.get(key) || ''); }).join('&');
   var storageKey = 'shifeng_light_entry_visit:' + signature;
-  var visitId = '';
-  try { visitId = sessionStorage.getItem(storageKey) || ''; } catch (_) {}
-  if (!visitId && window.crypto && typeof window.crypto.randomUUID === 'function') {
-    visitId = window.crypto.randomUUID();
-    try { sessionStorage.setItem(storageKey, visitId); } catch (_) {}
-  }
+  var visitId = query.get('entry_visit') || '';
+  try { visitId = visitId || sessionStorage.getItem(storageKey) || ''; } catch (_) {}
   function entryUrl(){
     var target = new URL(ENTRY);
     keys.forEach(function(key){ var value = query.get(key); if (value) target.searchParams.set(key, value); });
@@ -37,7 +31,7 @@
     event: 'page_view', sourceSlug: SOURCE, entryVisit: visitId,
     utmSource: query.get('utm_source') || '', utmMedium: query.get('utm_medium') || '',
     utmCampaign: query.get('utm_campaign') || '', utmContent: query.get('utm_content') || '',
-    utmTerm: query.get('utm_term') || '', sourcePage: window.location.pathname,
+    utmTerm: query.get('utm_term') || '', fbclid: query.get('fbclid') || '', sourcePage: window.location.pathname,
     referrer: document.referrer || ''
   };
   fetch(API, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload), keepalive:true })
@@ -329,9 +323,6 @@ html.js .reveal.in{opacity:1;transform:none}
 </style>
 </head>
 <body>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KSB7777L" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="var(--accent)"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#d7dee7"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7" fill="none" stroke="#5f6a78" stroke-width="2.4" stroke-linecap="round"/></symbol>
@@ -666,9 +657,11 @@ html.js .reveal.in{opacity:1;transform:none}
   document.querySelectorAll('a[data-register]').forEach(function(a){
     if (window.__shifengLightEntry) window.__shifengLightEntry.apply();
     a.removeAttribute('target');
-    a.addEventListener('click', function(){
+    a.addEventListener('click', function(e){
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ event:'shifeng_light_line_click', entry_source:'github-light-line' });
+      if(window.shifengPixel)window.shifengPixel.lead();
+      if(!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&!e.altKey){e.preventDefault();setTimeout(function(){location.assign(a.href)},300)}
     });
   });
 

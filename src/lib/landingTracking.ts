@@ -36,16 +36,6 @@ function dataLayerPush(event: string, data: CampaignData) {
   });
 }
 
-async function waitForMetaPixel(timeoutMs = 120) {
-  const startedAt = Date.now();
-  while (Date.now() - startedAt < timeoutMs) {
-    const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
-    if (typeof fbq === 'function') return fbq;
-    await new Promise((resolve) => window.setTimeout(resolve, 20));
-  }
-  return null;
-}
-
 function safeReferrer() {
   if (!document.referrer) return '';
   try {
@@ -57,7 +47,7 @@ function safeReferrer() {
 }
 
 function storageKey(data: CampaignData) {
-  const signature = [data.utmSource, data.utmMedium, data.utmCampaign, data.utmContent].join('|');
+  const signature = [data.utmSource, data.utmMedium, data.utmCampaign, data.utmContent, data.fbclid].join('|');
   return `${VISIT_KEY_PREFIX}:${encodeURIComponent(signature).slice(0, 500)}`;
 }
 
@@ -106,18 +96,19 @@ export function ensureLandingVisit() {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         event: 'page_view',
-        entryVisit: remembered,
         referrer: safeReferrer(),
         ...initial,
+        entryVisit: initial.entryVisit || remembered,
       }),
       keepalive: true,
+      signal: AbortSignal.timeout(8000),
     });
     const result = (await response.json().catch(() => ({}))) as TrackingResponse;
     const visitId = result.entryVisit || '';
-    if (!response.ok || !validVisitId(visitId)) return remembered;
+    if (!response.ok || !validVisitId(visitId)) { landingVisitPromise = null; return remembered; }
     rememberVisit(initial, visitId);
     return visitId;
-  })().catch(() => '');
+  })().catch(() => { landingVisitPromise = null; return ''; });
   return landingVisitPromise;
 }
 
@@ -152,6 +143,5 @@ export async function trackLineRegistrationClick(entryVisit: string) {
       keepalive: true,
     }).catch(() => {});
   }
-  const fbq = await waitForMetaPixel();
-  fbq?.('track', 'Lead');
+  (window as Window & {shifengPixel?:{lead:()=>boolean}}).shifengPixel?.lead();
 }

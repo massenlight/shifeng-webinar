@@ -16,6 +16,7 @@ import {
   ensureLandingVisit,
   trackFormOpen,
   trackRegistrationSubmitted,
+  trackLineRegistrationClick,
 } from '../lib/landingTracking';
 
 interface RegistrationModalProps {
@@ -244,14 +245,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
         }),
       });
       const result = (await response.json().catch(() => ({}))) as SubmitResponse;
-      if (response.status === 409) {
-        setLineUrl(LINE_URL);
-        setSubmitted(true);
-        return;
-      }
+      if (response.status === 409) { void refreshSessions(true); throw new Error(result.error || '場次已更新，請重新選擇時間。'); }
       if (!response.ok || !result.ok) throw new Error(result.error || '報名暫時無法完成，請稍後再試');
+      if (!result.lineUrl) throw new Error('LINE 報名連結尚未建立，請再試一次。');
       trackRegistrationSubmitted(entryVisit);
-      setLineUrl(result.lineUrl || LINE_URL);
+      void trackLineRegistrationClick(entryVisit);
+      setLineUrl(result.lineUrl);
       setSubmitted(true);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : '報名暫時無法完成，請稍後再試');
