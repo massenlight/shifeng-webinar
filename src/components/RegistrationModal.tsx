@@ -6,8 +6,6 @@ import {
   CircleAlert,
   Clock3,
   LoaderCircle,
-  Mail,
-  Phone,
   UserRound,
   X,
 } from 'lucide-react';
@@ -144,7 +142,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [lineUrl, setLineUrl] = useState(LINE_URL);
-  const [form, setForm] = useState({ name: '', phone: '', email: '', consent: false, website: '' });
+  const [form, setForm] = useState({ consent: false, website: '' });
 
   const selectedSession = useMemo(
     () => sessions.find((session) => session.id === selectedSessionId) || null,
@@ -333,14 +331,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
               </fieldset>
 
               <fieldset className="space-y-4">
-                <legend className="text-sm font-bold text-white mb-3 flex items-center gap-2"><UserRound className="w-5 h-5 text-red-500" />2. 填寫聯絡資料</legend>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <label className="grid gap-2 text-sm font-bold text-neutral-200 sm:col-span-2">姓名／稱呼<span className="relative"><UserRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" /><input autoComplete="name" className="w-full min-h-12 bg-[#111] border border-neutral-700 rounded-md pl-11 pr-3 text-base text-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-900" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} required minLength={2} maxLength={60} /></span></label>
-                  <label className="grid gap-2 text-sm font-bold text-neutral-200">手機號碼<span className="relative"><Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" /><input type="tel" inputMode="tel" autoComplete="tel" className="w-full min-h-12 bg-[#111] border border-neutral-700 rounded-md pl-11 pr-3 text-base text-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-900" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} placeholder="09xxxxxxxx" required /></span></label>
-                  <label className="grid gap-2 text-sm font-bold text-neutral-200">Email<span className="relative"><Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" /><input type="email" inputMode="email" autoComplete="email" className="w-full min-h-12 bg-[#111] border border-neutral-700 rounded-md pl-11 pr-3 text-base text-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-900" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} placeholder="name@example.com" required /></span></label>
-                </div>
+                <legend className="text-sm font-bold text-white mb-3 flex items-center gap-2"><UserRound className="w-5 h-5 text-red-500" />2. 確認報名</legend>
                 <label className="sr-only" aria-hidden="true">網站<input tabIndex={-1} autoComplete="off" value={form.website} onChange={(event) => setForm({ ...form, website: event.target.value })} /></label>
-                <label className="min-h-11 flex items-start gap-3 text-sm leading-6 text-neutral-300 cursor-pointer"><input type="checkbox" className="mt-1 w-4 h-4 accent-red-600 shrink-0" checked={form.consent} onChange={(event) => setForm({ ...form, consent: event.target.checked })} required /><span>我同意將上述資料用於本次說明會報名、聯繫與後續通知。</span></label>
+                <label className="min-h-11 flex items-start gap-3 text-sm leading-6 text-neutral-300 cursor-pointer"><input type="checkbox" className="mt-1 w-4 h-4 accent-red-600 shrink-0" checked={form.consent} onChange={(event) => setForm({ ...form, consent: event.target.checked })} required /><span>我同意用於本次說明會報名、聯繫與後續 LINE 通知。</span></label>
               </fieldset>
 
               {error && <p className="p-3 bg-red-950/60 border border-red-800 rounded-md text-sm text-red-200 flex items-start gap-2" role="alert"><CircleAlert className="w-5 h-5 shrink-0" />{error}</p>}
