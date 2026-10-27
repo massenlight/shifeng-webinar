@@ -62,7 +62,7 @@ export default function App() {
           onOpenRegister={handleOpenRegister}
         />
 
-        <ThreadsCheckup ref={checkup} />
+        <ThreadsCheckup ref={checkup} onOpenRegister={handleOpenRegister} />
 
         <div ref={deferredContentAnchor} className="h-px" aria-hidden="true" />
         {showDeferredContent ? (

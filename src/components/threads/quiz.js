@@ -1,5 +1,4 @@
 import {classify} from './logic.js';
-const LINE_URL='https://massenlighten-platform.massenlighten-company.workers.dev/r/github-light-line';
 const questions=[
  ['使用現況','你目前使用 Threads 的狀態是？',['還沒開始經營，主要是看別人發文。','最近開始嘗試，還在摸索怎麼寫。','已經營一段時間，持續有在發文。','有經營經驗，也曾替品牌或客戶操作帳號。']],
  ['帳號定位','如果問你「別人為什麼要追蹤你」，你會怎麼回答？',['我還不確定自己適合分享什麼。','我有很多想分享的事，但主題有點分散。','我有固定主題，但還說不清楚自己的特色。','我清楚知道要吸引誰，以及能提供什麼價值。']],
@@ -9,7 +8,7 @@ const questions=[
  ['經營目標','你最希望 Threads 幫你達成什麼？',['先找到定位，開始建立自己的個人品牌。','推廣自己的商品、服務或專業，增加客戶。','學會替品牌經營帳號，透過代操接案增加收入。','已有變現方向，希望提高效率、穩定放大收入。']]
 ];
 const results={A:{name:'潛力新芽型',icon:'🌱'},B:{name:'埋沒實力型',icon:'💎'},C:{name:'人氣磁鐵型',icon:'🧲'},D:{name:'成長操盤型',icon:'🚀'}};
-export function mountCheckup(root){
+export function mountCheckup(root,onOpenRegister){
 const app=root.querySelector('#app');
 
 let state={screen:'home',step:0,answers:Array(6).fill(null)};
@@ -67,9 +66,10 @@ const shortResults={
  C:{summary:'把關注變成信任，再把信任變成詢問。',steps:[['吸引對的人','確認內容貼近潛在客戶的需求。'],['建立信任','用海陸空策略搭配專業與案例。'],['引導詢問','清楚介紹服務，留下私訊入口。']]},
  D:{summary:'把有效的方法，變成可持續的系統。',steps:[['建立流程','固定選題、發文與復盤步驟。'],['AI 協作','用自己的案例與模板加快產出。'],['拓展變現','優化成交流程，或整理接案提案。']]}
 };
-function result(){const type=classify(state.answers),r=results[type],brief=shortResults[type];return `<section class="compact-result"><div class="compact-heading"><span class="compact-eyebrow">YOUR THREADS PROFILE ／ 測驗完成</span><h1 tabindex="-1"><span class="compact-letter">${type}</span>${r.name}<span class="compact-icon" aria-hidden="true">${r.icon}</span></h1><p>${brief.summary}</p></div><div class="compact-plan"><h2>你的 3 個優化方向</h2><ol>${brief.steps.map(([title,description],i)=>`<li><span class="compact-num">0${i+1}</span><div><h3>${title}</h3><p>${description}</p></div></li>`).join('')}</ol></div><a class="compact-line" href="${LINE_URL}" target="_blank" rel="noopener noreferrer"><span class="line-icon">LINE</span><span>加入 LINE，掌握更多變現技巧</span><span aria-hidden="true">↗</span><span class="sr-only">（另開視窗）</span></a><div class="compact-actions"><button class="text-button" id="restart">重新測驗 ↻</button></div></section>`;}
+function result(){const type=classify(state.answers),r=results[type],brief=shortResults[type];return `<section class="compact-result"><div class="compact-heading"><span class="compact-eyebrow">YOUR THREADS PROFILE ／ 測驗完成</span><h1 tabindex="-1"><span class="compact-letter">${type}</span>${r.name}<span class="compact-icon" aria-hidden="true">${r.icon}</span></h1><p>${brief.summary}</p></div><div class="compact-plan"><h2>你的 3 個優化方向</h2><ol>${brief.steps.map(([title,description],i)=>`<li><span class="compact-num">0${i+1}</span><div><h3>${title}</h3><p>${description}</p></div></li>`).join('')}</ol></div><button type="button" class="compact-line" id="register"><span aria-hidden="true">✦</span><span>報名說明會，掌握更多變現技巧</span><span aria-hidden="true">↗</span></button><div class="compact-actions"><button class="text-button" id="restart">重新測驗 ↻</button></div></section>`;}
 
 function bind(){
+ modalBody.querySelector('#register')?.addEventListener('click',()=>{closeQuestionnaire();onOpenRegister();});
  modalBody.querySelector('#back')?.addEventListener('click',()=>{if(state.step===0){closeQuestionnaire();return;}state.step--;render();});
  modalBody.querySelector('#quiz-form')?.addEventListener('change',e=>{if(e.target.name!=='answer')return;state.answers[state.step]=Number(e.target.value);save();modalBody.querySelector('.next').disabled=false;});
  modalBody.querySelector('#quiz-form')?.addEventListener('submit',e=>{e.preventDefault();if(state.answers[state.step]===null)return;if(state.step<5)state.step++;else state.screen='result';render();});
