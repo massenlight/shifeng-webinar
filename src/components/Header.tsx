@@ -95,16 +95,16 @@ export const Header: React.FC<HeaderProps> = ({
           >
             我要報名
           </button>
-          <button
-            onClick={onOpenCheckup}
-            className="px-3 py-2 border border-red-700 rounded-sm text-red-400 hover:bg-red-800 hover:text-white transition-colors cursor-pointer normal-case tracking-normal whitespace-nowrap"
-          >
-            threads人格測驗
-          </button>
         </nav>
 
         {/* Action Buttons */}
-        <div className="hidden lg:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-3 shrink-0">
+          <button
+            onClick={onOpenCheckup}
+            className="px-5 py-2.5 bg-white text-black font-extrabold text-xs tracking-widest hover:bg-red-700 hover:text-white transition-all duration-200 cursor-pointer shadow-md rounded-sm whitespace-nowrap"
+          >
+            threads人格測驗
+          </button>
           {/* Main Call to Action Button */}
           <button
             onClick={onOpenRegister}
@@ -167,7 +167,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenCheckup(); }}
-            className="w-full py-3 border border-red-700 rounded-sm text-red-400 font-bold text-sm"
+            className="w-full py-3 bg-white text-black hover:bg-red-700 hover:text-white transition-colors rounded-sm font-bold text-sm"
           >
             threads人格測驗
           </button>
