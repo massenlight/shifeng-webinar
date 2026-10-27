@@ -87,7 +87,7 @@ html{scrollbar-gutter:stable}
 .hero .persona-title>span,.hero .persona-title>em{display:block}
 
 /* Keep the personality headline on two deliberate lines at every width. */
-.hero-copy{container-type:inline-size;min-width:0}
+.hero-copy{container-type:inline-size;min-width:0;width:100%}
 .hero .persona-title{letter-spacing:-.035em;line-height:1.28}
 .hero .persona-title .persona-intro{font-size:clamp(24px,8.5cqw,48px);white-space:nowrap;margin-bottom:8px}
 .hero .persona-title .persona-main{font-size:clamp(30px,12cqw,72px);white-space:nowrap}
