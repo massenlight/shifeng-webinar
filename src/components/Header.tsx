@@ -3,10 +3,12 @@ import { Flame, ArrowRight, Menu, X, Sparkles } from 'lucide-react';
 
 interface HeaderProps {
   onOpenRegister: () => void;
+  onOpenCheckup: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenRegister,
+  onOpenCheckup,
 }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -62,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
         </a>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs font-medium uppercase tracking-[0.18em]">
+        <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-xs font-medium uppercase tracking-[0.18em]">
           <button
             onClick={() => scrollToSection('target-audience')}
             className="text-neutral-400 hover:text-white transition-colors cursor-pointer"
@@ -93,6 +95,12 @@ export const Header: React.FC<HeaderProps> = ({
           >
             我要報名
           </button>
+          <button
+            onClick={onOpenCheckup}
+            className="px-3 py-2 border border-red-700 rounded-sm text-red-400 hover:bg-red-800 hover:text-white transition-colors cursor-pointer normal-case tracking-normal whitespace-nowrap"
+          >
+            threads人格測驗
+          </button>
         </nav>
 
         {/* Action Buttons */}
@@ -112,6 +120,8 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-2 lg:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? '關閉選單' : '開啟選單'}
+            aria-expanded={mobileMenuOpen}
             className="p-2 rounded-lg bg-neutral-900 text-neutral-300 border border-neutral-800 cursor-pointer"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -154,6 +164,13 @@ export const Header: React.FC<HeaderProps> = ({
               我要報名
             </button>
           </div>
+
+          <button
+            onClick={() => { setMobileMenuOpen(false); onOpenCheckup(); }}
+            className="w-full py-3 border border-red-700 rounded-sm text-red-400 font-bold text-sm"
+          >
+            threads人格測驗
+          </button>
 
           <div className="pt-4 border-t border-neutral-800 flex flex-col gap-2">
             <button

@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Header } from './components/Header';
+import { ThreadsCheckup, type ThreadsCheckupHandle } from './components/ThreadsCheckup';
 import { Hero } from './components/Hero';
 import { DEFAULT_IMAGE_SLOTS } from './data/courseData';
 import { ensureLandingVisit } from './lib/landingTracking';
@@ -13,6 +14,7 @@ const Footer = lazy(() => import('./components/Footer').then((module) => ({ defa
 const RegistrationModal = lazy(() => import('./components/RegistrationModal').then((module) => ({ default: module.RegistrationModal })));
 
 export default function App() {
+  const checkup = useRef<ThreadsCheckupHandle>(null);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [showDeferredContent, setShowDeferredContent] = useState(false);
   const deferredContentAnchor = useRef<HTMLDivElement>(null);
@@ -51,7 +53,7 @@ export default function App() {
     <div className="min-h-screen bg-black text-white font-sans selection:bg-red-900 selection:text-white antialiased">
       
       {/* Sticky Header */}
-      <Header onOpenRegister={handleOpenRegister} />
+      <Header onOpenRegister={handleOpenRegister} onOpenCheckup={() => checkup.current?.open()} />
 
       {/* Main Content Sections */}
       <main>
@@ -59,6 +61,8 @@ export default function App() {
           heroImageUrl={heroImage}
           onOpenRegister={handleOpenRegister}
         />
+
+        <ThreadsCheckup ref={checkup} />
 
         <div ref={deferredContentAnchor} className="h-px" aria-hidden="true" />
         {showDeferredContent ? (
