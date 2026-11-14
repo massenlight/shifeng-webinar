@@ -15,7 +15,10 @@ const RegistrationModal = lazy(() => import('./components/RegistrationModal').th
 
 export default function App() {
   const checkup = useRef<ThreadsCheckupHandle>(null);
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  // ?register=1（明亮版健檢結果頁帶過來）一進頁面就打開選場次的說明會報名視窗。
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(
+    () => new URLSearchParams(window.location.search).get('register') === '1',
+  );
   const [showDeferredContent, setShowDeferredContent] = useState(false);
   const deferredContentAnchor = useRef<HTMLDivElement>(null);
 
