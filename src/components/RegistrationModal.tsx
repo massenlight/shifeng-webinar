@@ -289,7 +289,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
           <div>
             <p className="text-xs font-mono font-bold tracking-[0.15em] text-red-400 mb-1">免費線上說明會</p>
             <h2 id="registration-title" className="text-xl sm:text-2xl font-bold text-white font-display">選擇場次，預約 Threads 流量變現說明會</h2>
-            <p className="mt-2 text-sm text-neutral-400">直播約 90 分鐘・使用手機或電腦皆可參加</p>
+            <p className="mt-2 text-sm text-neutral-400">直播約 60 分鐘・使用手機或電腦皆可參加</p>
           </div>
           <button type="button" onClick={closeModal} aria-label="關閉報名視窗" className="min-w-11 min-h-11 grid place-items-center bg-black hover:bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800 transition-colors cursor-pointer rounded-md">
             <X className="w-5 h-5" />
