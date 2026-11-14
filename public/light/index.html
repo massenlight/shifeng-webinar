@@ -689,21 +689,18 @@ html.js .reveal.in{opacity:1;transform:none}
 <dialog class="reg" id="reg-dialog" aria-labelledby="reg-title">
   <div class="reg__head">
     <div>
-      <p class="reg__eyebrow">免費線上說明會</p>
-      <h2 class="reg__title" id="reg-title">選擇場次，預約 Threads 流量變現說明會</h2>
+      <h2 class="reg__title" id="reg-title">預約 Threads 流量變現說明會</h2>
       <p class="reg__sub">直播約 60 分鐘・使用手機或電腦皆可參加</p>
     </div>
     <button type="button" class="reg__close" id="reg-close" aria-label="關閉報名視窗">×</button>
   </div>
   <form class="reg__body" id="reg-form" novalidate>
-    <p class="reg__legend">1. 選擇直播場次</p>
+    <p class="reg__legend">選擇直播場次</p>
     <div id="reg-sessions"><div class="reg__state" role="status">正在讀取可報名場次…</div></div>
-    <p class="reg__legend">2. 確認報名</p>
     <label class="reg__hp" aria-hidden="true">網站<input type="text" id="reg-website" tabindex="-1" autocomplete="off"></label>
     <label class="reg__consent"><input type="checkbox" id="reg-consent"><span>我同意用於本次說明會報名、聯繫與後續 LINE 通知。</span></label>
     <p class="reg__error" id="reg-error" role="alert" hidden></p>
     <button type="submit" class="btn btn--primary reg__submit" id="reg-submit" disabled>免費報名並且加入官方LINE</button>
-    <p class="reg__fine">按下後會直接開啟世豐官方 LINE 完成報名，不必再填一次。</p>
   </form>
 </dialog>
 
@@ -788,10 +785,9 @@ html.js .reveal.in{opacity:1;transform:none}
         var label = document.createElement('label'); label.className = 'reg__opt';
         var input = document.createElement('input'); input.type = 'radio'; input.name = 'webinar-session'; input.value = item.id; input.checked = item.id === selected;
         input.addEventListener('change', function(){ selected = item.id; });
-        var text = document.createElement('span'), strong = document.createElement('strong'), meta = document.createElement('span');
+        var text = document.createElement('span'), strong = document.createElement('strong');
         strong.textContent = formatSession(item.startsAt);
-        meta.textContent = '約 ' + item.durationMinutes + ' 分鐘・線上直播';
-        text.appendChild(strong); text.appendChild(meta); label.appendChild(input); label.appendChild(text); list.appendChild(label);
+        text.appendChild(strong); label.appendChild(input); label.appendChild(text); list.appendChild(label);
       });
       box.appendChild(list);
     } else {
