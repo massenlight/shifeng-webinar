@@ -43,6 +43,25 @@ type SubmitResponse = {
 const API_BASE_URL = (import.meta.env.VITE_WEBINAR_API_BASE_URL || 'https://massenlighten-platform.massenlighten-company.workers.dev').replace(/\/$/, '');
 const REGISTRATION_FLOW = import.meta.env.VITE_REGISTRATION_FLOW === 'legacy' ? 'legacy' : 'fast';
 const LINE_URL = 'https://line.me/R/ti/p/@531cnikn';
+// 使用者 11-14：按下報名就直接開世豐官方 LINE 的報名頁（LIFF），不等後端回應。
+const LIFF_ID = '2011298970-dNpJY7A2';
+const IN_APP_BROWSER = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Threads|Barcelona/;
+function nativeLiffLink(url: string, userAgent: string) {
+  const origin = 'https://liff.line.me/';
+  if (!IN_APP_BROWSER.test(userAgent) || !url.startsWith(origin) || url.includes('#')) return url;
+  const rest = url.slice(origin.length);
+  if (/Android/.test(userAgent)) return `intent://app/${rest}#Intent;scheme=line;package=jp.naver.line.android;S.browser_fallback_url=${encodeURIComponent(url)};end`;
+  if (/iPhone|iPad|iPod/.test(userAgent)) return `line://app/${rest}`;
+  return url;
+}
+function makePreToken() {
+  if (typeof window.crypto?.randomUUID === 'function') return window.crypto.randomUUID();
+  const bytes = window.crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
 const PUBLIC_TEACHER_CACHE_MS = 60_000;
 const PUBLIC_TEACHER_RETRY_DELAY_MS = 700;
 const SESSION_LOAD_ERROR = '場次讀取暫時中斷，請重新載入；若仍無法顯示，可先加入 LINE 由團隊協助。';
@@ -230,29 +249,35 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
     }
     setSubmitting(true);
     try {
+      // 使用者 11-14：一點就跳到官方 LINE 的報名頁，預留場次的請求在背景送（keepalive 讓它在換頁後也送完）。
+      // 報名代碼由這裡產生並一起送給後端；LIFF 頁載入登入要幾秒，後端來得及存好，存不到那一頁會自己重試。
       const entryVisit = await ensureLandingVisit();
-      const response = await fetch(`${API_BASE_URL}/api/public/webinar-registrations`, {
+      const preToken = makePreToken();
+      const liffUrl = new URL(`https://liff.line.me/${LIFF_ID}`);
+      liffUrl.searchParams.set('pre', preToken);
+      if (entryVisit) liffUrl.searchParams.set('entry_visit', entryVisit);
+      liffUrl.searchParams.set('mode', 'registration');
+      void fetch(`${API_BASE_URL}/api/public/webinar-registrations`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
+        keepalive: true,
         body: JSON.stringify({
           teacherSlug: 'shifeng',
           sessionId: selectedSessionId,
           flow: REGISTRATION_FLOW,
+          preToken,
           ...form,
           ...campaignData(entryVisit),
         }),
-      });
-      const result = (await response.json().catch(() => ({}))) as SubmitResponse;
-      if (response.status === 409) { void refreshSessions(true); throw new Error(result.error || '場次已更新，請重新選擇時間。'); }
-      if (!response.ok || !result.ok) throw new Error(result.error || '報名暫時無法完成，請稍後再試');
-      if (!result.lineUrl) throw new Error('LINE 報名連結尚未建立，請再試一次。');
+      }).catch(() => {});
       trackRegistrationSubmitted(entryVisit);
       void trackLineRegistrationClick(entryVisit);
-      setLineUrl(result.lineUrl);
+      const target = nativeLiffLink(liffUrl.toString(), window.navigator.userAgent);
+      setLineUrl(target);
       setSubmitted(true);
+      window.location.assign(target);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : '報名暫時無法完成，請稍後再試');
-    } finally {
       setSubmitting(false);
     }
   }
@@ -339,9 +364,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
               {error && <p className="p-3 bg-red-950/60 border border-red-800 rounded-md text-sm text-red-200 flex items-start gap-2" role="alert"><CircleAlert className="w-5 h-5 shrink-0" />{error}</p>}
 
               <button type="submit" disabled={submitting || loadingSessions || sessions.length === 0} className="w-full min-h-14 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 disabled:opacity-45 disabled:cursor-not-allowed text-white font-extrabold tracking-wider text-sm transition-colors cursor-pointer rounded-md flex items-center justify-center gap-2 shadow-xl">
-                {submitting ? <><LoaderCircle className="w-5 h-5 animate-spin motion-reduce:animate-none" />正在完成報名…</> : <>確認場次並免費報名<ArrowRight className="w-5 h-5" /></>}
+                {submitting ? <><LoaderCircle className="w-5 h-5 animate-spin motion-reduce:animate-none" />正在開啟官方 LINE…</> : <>免費報名並且加入官方LINE<ArrowRight className="w-5 h-5" /></>}
               </button>
-              <p className="text-center text-xs leading-5 text-neutral-500">送出後會自動前往世豐官方 LINE；加入好友與填表為兩個獨立步驟。</p>
+              <p className="text-center text-xs leading-5 text-neutral-500">按下後會直接開啟世豐官方 LINE 完成報名，不必再填一次。</p>
             </form>
           )}
         </div>
