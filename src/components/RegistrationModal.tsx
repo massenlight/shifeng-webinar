@@ -4,9 +4,7 @@ import {
   CalendarDays,
   CheckCircle2,
   CircleAlert,
-  Clock3,
   LoaderCircle,
-  UserRound,
   X,
 } from 'lucide-react';
 import {
@@ -161,7 +159,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [lineUrl, setLineUrl] = useState(LINE_URL);
-  const [form, setForm] = useState({ consent: false, website: '' });
+  const [form, setForm] = useState({ consent: true, website: '' });
 
   const selectedSession = useMemo(
     () => sessions.find((session) => session.id === selectedSessionId) || null,
@@ -285,13 +283,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="registration-title" onMouseDown={(event) => { if (event.target === event.currentTarget) closeModal(); }}>
       <div className="relative w-full max-w-3xl max-h-[94dvh] bg-[#090909] border border-red-900/70 rounded-lg shadow-2xl overflow-hidden flex flex-col text-white">
-        <header className="px-5 py-4 sm:px-7 sm:py-5 border-b border-red-900/40 flex items-start justify-between gap-4 bg-[#0f0f0f]">
+        <header className="relative px-5 py-4 sm:px-7 sm:py-5 border-b border-red-900/40 flex items-start justify-between gap-4 bg-[#0f0f0f]">
           <div>
-            <p className="text-xs font-mono font-bold tracking-[0.15em] text-red-400 mb-1">免費線上說明會</p>
-            <h2 id="registration-title" className="text-xl sm:text-2xl font-bold text-white font-display">選擇場次，預約 Threads 流量變現說明會</h2>
-            <p className="mt-2 text-sm text-neutral-400">直播約 60 分鐘・使用手機或電腦皆可參加</p>
+            <h2 id="registration-title" className="pr-9 sm:pr-0 text-[clamp(15px,4.6vw,20px)] sm:text-2xl font-bold text-white font-display">預約 Threads 流量變現說明會</h2>
+            <p className="mt-2 text-[13px] sm:text-sm text-neutral-400">直播約 60 分鐘・使用手機或電腦皆可參加</p>
           </div>
-          <button type="button" onClick={closeModal} aria-label="關閉報名視窗" className="min-w-11 min-h-11 grid place-items-center bg-black hover:bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800 transition-colors cursor-pointer rounded-md">
+          <button type="button" onClick={closeModal} aria-label="關閉報名視窗" className="absolute top-2 right-2 min-w-9 min-h-9 sm:static sm:min-w-11 sm:min-h-11 grid place-items-center bg-black hover:bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800 transition-colors cursor-pointer rounded-md">
             <X className="w-5 h-5" />
           </button>
         </header>
@@ -313,7 +310,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
           ) : (
             <form onSubmit={handleSubmit} className="space-y-7">
               <fieldset>
-                <legend className="text-sm font-bold text-white mb-3 flex items-center gap-2"><CalendarDays className="w-5 h-5 text-red-500" />1. 選擇直播場次</legend>
+                <legend className="text-sm font-bold text-white mb-3 flex items-center gap-2"><CalendarDays className="w-5 h-5 text-red-500" />選擇直播場次</legend>
                 {loadingSessions && sessions.length === 0 ? (
                   <div className="min-h-28 border border-neutral-800 rounded-md grid place-items-center text-neutral-400" role="status"><span className="inline-flex items-center gap-2"><LoaderCircle className="w-5 h-5 animate-spin motion-reduce:animate-none" />正在讀取可報名場次…</span></div>
                 ) : sessionError && sessions.length === 0 ? (
@@ -335,12 +332,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
                       {sessions.map((session) => {
                         const selected = selectedSessionId === session.id;
                         return (
-                          <label key={session.id} className={`min-h-28 p-4 border rounded-md cursor-pointer transition-colors flex gap-3 ${selected ? 'border-red-500 bg-red-950/35' : 'border-neutral-800 bg-[#111] hover:border-neutral-600'}`}>
+                          <label key={session.id} className={`p-4 border rounded-md cursor-pointer transition-colors flex gap-3 ${selected ? 'border-red-500 bg-red-950/35' : 'border-neutral-800 bg-[#111] hover:border-neutral-600'}`}>
                             <input type="radio" name="webinar-session" value={session.id} checked={selected} onChange={() => setSelectedSessionId(session.id)} className="mt-1 w-4 h-4 accent-red-600 shrink-0" />
-                            <span>
-                              <strong className="block text-base text-white">{formatSession(session.startsAt)}</strong>
-                              <span className="mt-2 text-xs text-neutral-400 flex items-center gap-1.5"><Clock3 className="w-4 h-4" />約 {session.durationMinutes} 分鐘・線上直播</span>
-                            </span>
+                            <strong className="block text-base text-white">{formatSession(session.startsAt)}</strong>
                           </label>
                         );
                       })}
@@ -355,18 +349,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, on
                 )}
               </fieldset>
 
-              <fieldset className="space-y-4">
-                <legend className="text-sm font-bold text-white mb-3 flex items-center gap-2"><UserRound className="w-5 h-5 text-red-500" />2. 確認報名</legend>
                 <label className="sr-only" aria-hidden="true">網站<input tabIndex={-1} autoComplete="off" value={form.website} onChange={(event) => setForm({ ...form, website: event.target.value })} /></label>
-                <label className="min-h-11 flex items-start gap-3 text-sm leading-6 text-neutral-300 cursor-pointer"><input type="checkbox" className="mt-1 w-4 h-4 accent-red-600 shrink-0" checked={form.consent} onChange={(event) => setForm({ ...form, consent: event.target.checked })} required /><span>我同意用於本次說明會報名、聯繫與後續 LINE 通知。</span></label>
-              </fieldset>
 
               {error && <p className="p-3 bg-red-950/60 border border-red-800 rounded-md text-sm text-red-200 flex items-start gap-2" role="alert"><CircleAlert className="w-5 h-5 shrink-0" />{error}</p>}
 
               <button type="submit" disabled={submitting || loadingSessions || sessions.length === 0} className="w-full min-h-14 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 disabled:opacity-45 disabled:cursor-not-allowed text-white font-extrabold tracking-wider text-sm transition-colors cursor-pointer rounded-md flex items-center justify-center gap-2 shadow-xl">
                 {submitting ? <><LoaderCircle className="w-5 h-5 animate-spin motion-reduce:animate-none" />正在開啟官方 LINE…</> : <>免費報名並且加入官方LINE<ArrowRight className="w-5 h-5" /></>}
               </button>
-              <p className="text-center text-xs leading-5 text-neutral-500">按下後會直接開啟世豐官方 LINE 完成報名，不必再填一次。</p>
+              <p className="text-center text-xs leading-5 text-neutral-500">按下按鈕即表示同意以 LINE 帳號報名本次說明會，並接收聯繫與 LINE 通知。</p>
             </form>
           )}
         </div>

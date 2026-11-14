@@ -698,9 +698,10 @@ html.js .reveal.in{opacity:1;transform:none}
     <p class="reg__legend">選擇直播場次</p>
     <div id="reg-sessions"><div class="reg__state" role="status">正在讀取可報名場次…</div></div>
     <label class="reg__hp" aria-hidden="true">網站<input type="text" id="reg-website" tabindex="-1" autocomplete="off"></label>
-    <label class="reg__consent"><input type="checkbox" id="reg-consent"><span>我同意用於本次說明會報名、聯繫與後續 LINE 通知。</span></label>
+    <input type="checkbox" id="reg-consent" checked hidden>
     <p class="reg__error" id="reg-error" role="alert" hidden></p>
     <button type="submit" class="btn btn--primary reg__submit" id="reg-submit" disabled>免費報名並且加入官方LINE</button>
+    <p class="reg__fine">按下按鈕即表示同意以 LINE 帳號報名本次說明會，並接收聯繫與 LINE 通知。</p>
   </form>
 </dialog>
 
