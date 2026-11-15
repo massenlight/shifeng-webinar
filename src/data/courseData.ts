@@ -251,7 +251,7 @@ export const PRICING_PLANS = [
     badge: "限量早鳥優惠8.1折",
     popular: true,
     features: [
-      "2 天手把手實戰培訓課程",
+      "1 天手把手實戰培訓課程",
       "線上1V1教練顧問",
       "VIP 資源共享 社群",
       "【早鳥贈禮】100+ 個脆爆文模板",
